@@ -7,13 +7,16 @@ A powerful and flexible SimHub plugin that publishes granular racing telemetry d
 ## Features
 
 - **80+ Granular Telemetry Properties** - Select exactly what data you need
+- **Organized Tab Interface** - Clean UI with Connection, Presets, Telemetry, and Settings tabs
+- **Root-Level Property Control** - Choose to include/exclude timestamp, userId, and gameName
 - **Real-time MQTT Publishing** - Low-latency data streaming to any MQTT broker
 - **Quick Preset Configurations** - Basic, Racing, Strategy, and Analysis presets
 - **Export/Import Settings** - Share configurations between installations
 - **Connection Testing** - Built-in MQTT broker connectivity verification
 - **Password Protection** - Secure credential management with show/hide toggle
 - **Debug Mode** - Complete raw telemetry data for discovery and troubleshooting
-- **Multi-Game Support** - Works with any simulator supported by SimHub
+- **Performance Warnings** - Clear guidance on payload size and CPU usage
+- **Multi-Game Support** - Works with any simulator supported by SimHub (currently optimized for iRacing)
 
 ## Table of Contents
 
@@ -59,7 +62,7 @@ A powerful and flexible SimHub plugin that publishes granular racing telemetry d
 
 1. **Open SimHub** and navigate to the MQTT Publisher Enhanced plugin settings
 
-2. **Configure MQTT Connection**:
+2. **Configure MQTT Connection** (Connection Settings Tab):
    ```
    MQTT Server: mqtt://your-broker-address:1883
    Login: your_username (if authentication enabled)
@@ -73,19 +76,26 @@ A powerful and flexible SimHub plugin that publishes granular racing telemetry d
    - Troubleshoot any connection issues before proceeding
 
 4. **Select Telemetry Data**:
-   - Use **Quick Presets** for common configurations:
-     - **Basic**: Essential telemetry (speed, RPM, gear, throttle, brake)
-     - **Racing**: Racing-focused data (position, gaps, lap times, flags)
-     - **Strategy**: Strategy management (fuel, tire wear, pit stops)
-     - **Analysis**: Everything enabled for comprehensive analysis
 
-   - Or **manually select** individual properties from the expandable categories
+   **Option A - Use Quick Presets** (Quick Presets Tab):
+   - **Basic**: Essential telemetry (speed, RPM, gear, throttle, brake)
+   - **Racing**: Racing-focused data (position, gaps, lap times, flags)
+   - **Strategy**: Strategy management (fuel, tire wear, pit stops)
+   - **Analysis**: Everything enabled (except debug options)
 
-5. **Apply Settings** - Click the "Apply Settings" button to save and activate
+   **Option B - Manual Selection** (Telemetry Configuration Tab):
+   - Review the **Performance Notice** at the top
+   - Configure **Root Level Properties** (timestamp, userId, gameName)
+   - Expand categories and check individual properties you need
+   - Debug options available in Advanced Debugging section
+
+5. **Apply Settings** - Click the global "Apply Settings" button at the bottom to save and activate
 
 ### Advanced Configuration
 
 #### Export/Import Settings
+
+Go to the **Settings Management Tab**:
 
 **Export your configuration:**
 1. Click "Export Settings" button
@@ -98,18 +108,32 @@ A powerful and flexible SimHub plugin that publishes granular racing telemetry d
 3. Review the imported settings
 4. Click "Apply Settings" to activate
 
-#### Debug Mode
+#### Debug Options
 
-Enable debug mode to receive ALL raw telemetry data:
+Available in the **Advanced Debugging** section of the Telemetry Configuration tab:
 
-1. Expand the "Advanced Debugging" section
-2. Check "Enable Debug Mode (Send All Raw Telemetry)"
-3. Apply settings
+**Debug Flag Details:**
+- Shows individual flag breakdown (Green, Yellow, Red, Blue, etc.)
+- Useful for understanding flag system behavior
 
-**Warning:** Debug mode significantly increases data volume. Use only for:
-- Discovering available properties for your simulator
-- Troubleshooting data issues
-- Custom integration development
+**Debug Mode:**
+- Sends ALL raw telemetry data from the simulator
+- Includes complete GameData object with hundreds of properties
+- **Warning:** Significantly increases payload size and CPU usage
+- Use only for:
+  - Discovering available properties for your simulator
+  - Troubleshooting data issues
+  - Custom integration development
+
+#### Performance Considerations
+
+The plugin currently sends data on **every SimHub update (60-100+ times per second)**. Performance tips:
+
+- Enable only the properties you actually need
+- Disable entire categories you don't use
+- Avoid Debug Mode unless specifically needed for troubleshooting
+- More properties = Larger payloads = Higher CPU usage
+- Configurable update rate polling will be added in a future release
 
 ## Usage
 
@@ -150,6 +174,7 @@ The plugin publishes data as JSON with the following top-level structure:
 {
   "time": 1704067200000,
   "userId": "unique-user-id",
+  "gameName": "Assetto Corsa Competizione",
   "carState": { ... },
   "flagState": { ... },
   "positionData": { ... },
@@ -165,14 +190,19 @@ The plugin publishes data as JSON with the following top-level structure:
 }
 ```
 
-**Note:** Only enabled data categories appear in the payload. Null values are automatically excluded to minimize bandwidth.
+**Root-Level Properties:**
+- `time` - Unix timestamp in milliseconds (enabled by default)
+- `userId` - Unique identifier for the user (disabled by default)
+- `gameName` - Name of the racing simulator (enabled by default)
+
+**Note:** Only enabled data categories and properties appear in the payload. Null values are automatically excluded to minimize bandwidth.
 
 ### Example Output (Basic Preset)
 
 ```json
 {
   "time": 1704067200000,
-  "userId": "abc-123-def-456",
+  "gameName": "Assetto Corsa Competizione",
   "carState": {
     "SpeedKmh": 245.7,
     "Rpms": 8450,
@@ -182,8 +212,7 @@ The plugin publishes data as JSON with the following top-level structure:
     "CurrentLapTime": 94536.2
   },
   "flagState": {
-    "Flags": 4,
-    "GameName": "Assetto Corsa Competizione"
+    "Flags": 4
   }
 }
 ```
@@ -311,7 +340,15 @@ Contributions are welcome! Please feel free to:
 
 ## Version History
 
-**v1.0.0** (Current)
+**v1.1.0** (Current)
+- **Organized Tab Interface**: Separated UI into Connection, Presets, Telemetry, and Settings tabs
+- **Root-Level Property Control**: Choose which root properties to include (time, userId, gameName)
+- **Performance Warnings**: Added clear warnings about payload size and CPU usage
+- **Debug Flag Details**: Moved to Advanced Debugging section with dedicated checkbox
+- **Improved Presets**: "Enable All" now excludes debug options for safety
+- **Better UX**: Global Apply Settings button, clearer organization, helpful tooltips
+
+**v1.0.0**
 - Complete rewrite with 80+ granular telemetry properties
 - Quick preset configurations (Basic, Racing, Strategy, Analysis)
 - Export/Import settings functionality

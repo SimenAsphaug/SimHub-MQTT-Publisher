@@ -7,31 +7,31 @@ namespace SimHub.MQTTPublisher.Payload
     {
         public TireData(GameData data, SimHubMQTTPublisherPluginSettings settings)
         {
-            // Tire Temperatures
+            // Tire Temperatures (SimHub uses British spelling "Tyre")
             if (settings.Include_TireTemperatures)
             {
-                TemperatureFL = GetSafeDoubleProperty(data, "TyreTemperatureFL");
-                TemperatureFR = GetSafeDoubleProperty(data, "TyreTemperatureFR");
-                TemperatureRL = GetSafeDoubleProperty(data, "TyreTemperatureRL");
-                TemperatureRR = GetSafeDoubleProperty(data, "TyreTemperatureRR");
+                TemperatureFL = GetSafeDoubleProperty(data, "TyreTemperatureFrontLeft");
+                TemperatureFR = GetSafeDoubleProperty(data, "TyreTemperatureFrontRight");
+                TemperatureRL = GetSafeDoubleProperty(data, "TyreTemperatureRearLeft");
+                TemperatureRR = GetSafeDoubleProperty(data, "TyreTemperatureRearRight");
             }
 
-            // Tire Pressures
+            // Tire Pressures (SimHub uses British spelling "Tyre")
             if (settings.Include_TirePressures)
             {
-                PressureFL = GetSafeDoubleProperty(data, "TyrePressureFL");
-                PressureFR = GetSafeDoubleProperty(data, "TyrePressureFR");
-                PressureRL = GetSafeDoubleProperty(data, "TyrePressureRL");
-                PressureRR = GetSafeDoubleProperty(data, "TyrePressureRR");
+                PressureFL = GetSafeDoubleProperty(data, "TyrePressureFrontLeft");
+                PressureFR = GetSafeDoubleProperty(data, "TyrePressureFrontRight");
+                PressureRL = GetSafeDoubleProperty(data, "TyrePressureRearLeft");
+                PressureRR = GetSafeDoubleProperty(data, "TyrePressureRearRight");
             }
 
-            // Tire Wear
+            // Tire Wear (SimHub uses British spelling "Tyre")
             if (settings.Include_TireWear)
             {
-                WearFL = GetSafeDoubleProperty(data, "TyreWearFL");
-                WearFR = GetSafeDoubleProperty(data, "TyreWearFR");
-                WearRL = GetSafeDoubleProperty(data, "TyreWearRL");
-                WearRR = GetSafeDoubleProperty(data, "TyreWearRR");
+                WearFL = GetSafeDoubleProperty(data, "TyreWearFrontLeft");
+                WearFR = GetSafeDoubleProperty(data, "TyreWearFrontRight");
+                WearRL = GetSafeDoubleProperty(data, "TyreWearRearLeft");
+                WearRR = GetSafeDoubleProperty(data, "TyreWearRearRight");
             }
 
             // Tire Grip

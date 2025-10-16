@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <!-- Plugin Info Section -->
@@ -28,16 +29,12 @@
             </StackPanel>
         </styles:SHSection>
 
-        <!-- MQTT Settings Section -->
+        <!-- MQTT Settings Section with Tabs -->
         <styles:SHSection Grid.Row="1" Title="MQTT Settings">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-
-                <!-- Connection Settings -->
-                <GroupBox Grid.Row="0" Header="Connection Settings">
+            <TabControl>
+                <!-- Connection Settings Tab -->
+                <TabItem Header="Connection Settings">
+                    <GroupBox Header="MQTT Broker Connection">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="130" />
@@ -83,37 +80,81 @@
                             <styles:SHButtonPrimary Margin="0,0,8,0" Click="TestConnection_Click">Test Connection</styles:SHButtonPrimary>
                             <TextBlock x:Name="ConnectionStatusText" VerticalAlignment="Center" Text="Not tested" Foreground="Gray"/>
                         </StackPanel>
-
-                        <styles:SHButtonPrimary Margin="4" Grid.Row="6" Grid.Column="1" Click="Apply_Settings">Apply Settings</styles:SHButtonPrimary>
                     </Grid>
                 </GroupBox>
+                </TabItem>
 
-                <!-- Telemetry Options -->
-                <GroupBox Grid.Row="1" Header="Granular Telemetry Configuration">
+                <!-- Quick Presets Tab -->
+                <TabItem Header="Quick Presets">
+                    <GroupBox Header="Preset Configurations">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Select a preset configuration to quickly enable common telemetry sets:" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <styles:SHButtonPrimary Margin="0,0,8,0" Click="EnableAll_Click" MinWidth="100">Enable All</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="0,0,8,0" Click="DisableAll_Click" MinWidth="100">Disable All</styles:SHButtonPrimary>
+                            </StackPanel>
+
+                            <Separator Margin="0,0,0,12"/>
+
+                            <TextBlock Text="Specialized Presets:" FontWeight="Bold" Margin="0,0,0,8"/>
+
+                            <WrapPanel Orientation="Horizontal">
+                                <styles:SHButtonPrimary Margin="0,0,8,8" Click="EnableBasic_Click" MinWidth="120">Basic</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="0,0,8,8" Click="EnableRacing_Click" MinWidth="120">Racing</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="0,0,8,8" Click="EnableStrategy_Click" MinWidth="120">Strategy</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="0,0,8,8" Click="EnableAnalysis_Click" MinWidth="120">Analysis</styles:SHButtonPrimary>
+                            </WrapPanel>
+
+                            <Separator Margin="0,12,0,12"/>
+
+                            <TextBlock Text="Preset Descriptions:" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run Text="• Basic:" FontWeight="Bold"/> Essential car state data (speed, RPM, gear, throttle, brake)
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run Text="• Racing:" FontWeight="Bold"/> Position, timing, laps, flags, and essential racing info
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run Text="• Strategy:" FontWeight="Bold"/> Fuel, tire wear, damage, and pit information
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                <Run Text="• Analysis:" FontWeight="Bold"/> All timing deltas, sector times, and performance data
+                            </TextBlock>
+                        </StackPanel>
+                    </GroupBox>
+                </TabItem>
+
+                <!-- Telemetry Configuration Tab -->
+                <TabItem Header="Telemetry Configuration">
+                    <GroupBox Header="Select Telemetry Properties to Publish">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="500">
                         <StackPanel>
-                            <!-- Export/Import Settings -->
-                            <TextBlock Text="Configuration Management" FontWeight="Bold" Margin="4"/>
-                            <StackPanel Orientation="Horizontal" Margin="4,4,4,8">
-                                <styles:SHButtonPrimary Margin="2" Click="ExportSettings_Click">Export Settings</styles:SHButtonPrimary>
-                                <styles:SHButtonPrimary Margin="2" Click="ImportSettings_Click">Import Settings</styles:SHButtonPrimary>
-                            </StackPanel>
-                            <Separator Margin="0,0,0,8"/>
 
-                            <!-- Quick Preset Actions -->
-                            <TextBlock Text="Quick Presets" FontWeight="Bold" Margin="4"/>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <styles:SHButtonPrimary Margin="2" Click="EnableAll_Click">Enable All</styles:SHButtonPrimary>
-                                <styles:SHButtonPrimary Margin="2" Click="DisableAll_Click">Disable All</styles:SHButtonPrimary>
-                                <styles:SHButtonPrimary Margin="2" Click="EnableBasic_Click">Basic</styles:SHButtonPrimary>
-                                <styles:SHButtonPrimary Margin="2" Click="EnableRacing_Click">Racing</styles:SHButtonPrimary>
-                                <styles:SHButtonPrimary Margin="2" Click="EnableStrategy_Click">Strategy</styles:SHButtonPrimary>
-                                <styles:SHButtonPrimary Margin="2" Click="EnableAnalysis_Click">Analysis</styles:SHButtonPrimary>
-                            </StackPanel>
-                            <Separator Margin="0,4,0,8"/>
+                            <!-- Performance Notice -->
+                            <Border Background="#FFF3E0" BorderBrush="Orange" BorderThickness="1" Padding="10" Margin="2,2,2,8">
+                                <StackPanel>
+                                    <TextBlock Text="⚠️ Performance Notice" FontWeight="Bold" Foreground="DarkOrange" Margin="0,0,0,4"/>
+                                    <TextBlock TextWrapping="Wrap" Foreground="#555">
+                                        <Run Text="The more properties you enable, the larger the MQTT payloads and higher the CPU usage."/><LineBreak/>
+                                        <Run Text="The plugin currently sends data on every SimHub update (60-100+ times/second)."/><LineBreak/>
+                                        <Run Text="Configurable update rate will be added in a future release."/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Root Level Properties -->
+                            <Expander Header="Root Level Properties" IsExpanded="False" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <TextBlock Text="Core metadata properties included at the root of the JSON payload" TextWrapping="Wrap" Margin="0,0,0,8" FontStyle="Italic" Foreground="Gray"/>
+                                    <CheckBox Content="Timestamp (Unix milliseconds)" IsChecked="{Binding Path=Include_Time}" Margin="2"/>
+                                    <CheckBox Content="User ID (Unique identifier)" IsChecked="{Binding Path=Include_UserId}" Margin="2"/>
+                                    <CheckBox Content="Game Name (Simulator name)" IsChecked="{Binding Path=Include_GameName}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
 
                             <!-- Car State -->
-                            <Expander Header="Car State" IsExpanded="True" Margin="2">
+                            <Expander Header="Car State" IsExpanded="False" Margin="2">
                                 <StackPanel Margin="15,5,5,5">
                                     <CheckBox Content="Speed (km/h)" IsChecked="{Binding Path=Include_SpeedKmh}" Margin="2"/>
                                     <CheckBox Content="RPM" IsChecked="{Binding Path=Include_Rpms}" Margin="2"/>
@@ -131,12 +172,10 @@
                             </Expander>
 
                             <!-- Flag Information -->
-                            <Expander Header="Flag Information" IsExpanded="True" Margin="2">
+                            <Expander Header="Flag Information" IsExpanded="False" Margin="2">
                                 <StackPanel Margin="15,5,5,5">
                                     <CheckBox Content="Flag State (Integer)" IsChecked="{Binding Path=Include_Flags}" Margin="2"/>
                                     <CheckBox Content="Flag Name" IsChecked="{Binding Path=Include_FlagName}" Margin="2"/>
-                                    <CheckBox Content="Game Name" IsChecked="{Binding Path=Include_GameName}" Margin="2"/>
-                                    <CheckBox Content="Debug Flag Details" IsChecked="{Binding Path=Include_DebugFlags}" Margin="2"/>
                                 </StackPanel>
                             </Expander>
 
@@ -286,14 +325,26 @@
                             <!-- Advanced Debugging -->
                             <Expander Header="Advanced Debugging" Margin="2">
                                 <StackPanel Margin="15,5,5,5">
-                                    <TextBlock Text="WARNING: Debug mode sends ALL raw telemetry data" FontWeight="Bold" Margin="0,0,0,8"/>
-                                    <TextBlock Text="This includes the complete GameData object with all properties from the simulator. Use with caution as this will significantly increase data volume." TextWrapping="Wrap" Margin="0,0,0,12"/>
+                                    <TextBlock Text="⚠️ PERFORMANCE WARNING" FontWeight="Bold" Margin="0,0,0,8" Foreground="Orange"/>
+                                    <TextBlock TextWrapping="Wrap" Margin="0,0,0,12" Foreground="Gray">
+                                        <Run Text="More telemetry properties = Larger payloads = Higher CPU usage."/><LineBreak/>
+                                        <Run Text="The plugin currently uses SimHub's DataUpdate callback (called 60-100+ times per second)."/><LineBreak/>
+                                        <Run Text="Configurable update rate polling will be added in a future update."/>
+                                    </TextBlock>
 
-                                    <CheckBox Content="Enable Debug Mode (Send All Raw Telemetry)" IsChecked="{Binding Path=EnableDebugMode}" Margin="0,0,0,12" FontWeight="Bold"/>
+                                    <Separator Margin="0,0,0,12"/>
 
-                                    <Separator Margin="0,0,0,8"/>
+                                    <TextBlock Text="Debug Options" FontWeight="Bold" Margin="0,0,0,8"/>
 
-                                    <TextBlock Text="Use Cases:" FontWeight="Bold" Margin="0,0,0,4"/>
+                                    <CheckBox Content="Debug Flag Details (Individual flag breakdown)" IsChecked="{Binding Path=Include_DebugFlags}" Margin="0,0,0,8"/>
+
+                                    <CheckBox Content="Enable Debug Mode (Send ALL Raw Telemetry)" IsChecked="{Binding Path=EnableDebugMode}" Margin="0,0,0,12" FontWeight="Bold"/>
+
+                                    <TextBlock Text="WARNING: Debug mode sends the complete GameData object with all properties from the simulator. Use with caution as this will significantly increase data volume." TextWrapping="Wrap" Margin="0,0,0,12" Foreground="Orange"/>
+
+                                    <Separator Margin="0,0,0,12"/>
+
+                                    <TextBlock Text="Debug Mode Use Cases:" FontWeight="Bold" Margin="0,0,0,4"/>
                                     <TextBlock Text="• Discover new telemetry properties available in your simulator" TextWrapping="Wrap" Margin="12,2,0,2"/>
                                     <TextBlock Text="• Debug and troubleshoot data issues" TextWrapping="Wrap" Margin="12,2,0,2"/>
                                     <TextBlock Text="• Explore complete data structure for custom integrations" TextWrapping="Wrap" Margin="12,2,0,8"/>
@@ -305,7 +356,58 @@
                         </StackPanel>
                     </ScrollViewer>
                 </GroupBox>
-            </Grid>
+                </TabItem>
+
+                <!-- Settings Management Tab -->
+                <TabItem Header="Settings Management">
+                    <GroupBox Header="Import and Export Configuration">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Backup and restore your telemetry configuration:" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <styles:SHButtonPrimary Margin="0,0,8,0" Click="ExportSettings_Click" MinWidth="120">Export Settings</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="0,0,8,0" Click="ImportSettings_Click" MinWidth="120">Import Settings</styles:SHButtonPrimary>
+                            </StackPanel>
+
+                            <Separator Margin="0,0,0,16"/>
+
+                            <TextBlock Text="What's Included:" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                • All telemetry property selections (80+ individual properties)
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                • MQTT connection settings (server, login, topic)
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+                                • Advanced debugging options
+                            </TextBlock>
+
+                            <Separator Margin="0,16,0,16"/>
+
+                            <TextBlock Text="Notes:" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4" Foreground="Gray">
+                                • Settings are exported to a JSON file for easy backup and sharing
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4" Foreground="Gray">
+                                • User ID is NOT exported for privacy and uniqueness
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,4" Foreground="Gray">
+                                • Click "Apply Settings" after importing to activate the new configuration
+                            </TextBlock>
+                        </StackPanel>
+                    </GroupBox>
+                </TabItem>
+            </TabControl>
+        </styles:SHSection>
+
+        <!-- Global Apply Settings Button -->
+        <styles:SHSection Grid.Row="2" Title="Save Configuration">
+            <StackPanel Orientation="Horizontal" Margin="0">
+                <styles:SHButtonPrimary Click="Apply_Settings" MinWidth="150" Padding="12,8">Apply Settings</styles:SHButtonPrimary>
+                <TextBlock VerticalAlignment="Center" Margin="12,0,0,0" Foreground="Gray" TextWrapping="Wrap">
+                    Click to save all connection settings and telemetry selections
+                </TextBlock>
+            </StackPanel>
         </styles:SHSection>
     </Grid>
 </UserControl>

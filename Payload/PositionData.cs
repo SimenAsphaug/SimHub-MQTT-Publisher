@@ -29,7 +29,7 @@ namespace SimHub.MQTTPublisher.Payload
             if (settings.Include_BestLapTime)
                 BestLapTime = GetSafeDoubleProperty(data, "BestLapTime");
             if (settings.Include_PersonalBestLapTime)
-                PersonalBestLapTime = GetSafeDoubleProperty(data, "PersonalBestLapTime");
+                PersonalBestLapTime = GetSafeDoubleProperty(data, "AllTimeBest");  // iRacing uses "AllTimeBest"
             if (settings.Include_SessionBestLapTime)
                 SessionBestLapTime = GetSafeDoubleProperty(data, "SessionBestLapTime");
 
@@ -37,7 +37,7 @@ namespace SimHub.MQTTPublisher.Payload
             if (settings.Include_DeltaToSessionBest)
                 DeltaToSessionBest = GetSafeDoubleProperty(data, "DeltaToSessionBest");
             if (settings.Include_DeltaToPersonalBest)
-                DeltaToPersonalBest = GetSafeDoubleProperty(data, "DeltaToPersonalBest");
+                DeltaToPersonalBest = GetSafeDoubleProperty(data, "DeltaToAllTimeBest");  // iRacing uses "DeltaToAllTimeBest"
             if (settings.Include_DeltaToOptimal)
                 DeltaToOptimal = GetSafeDoubleProperty(data, "DeltaToOptimal");
 
@@ -49,13 +49,13 @@ namespace SimHub.MQTTPublisher.Payload
             if (settings.Include_Sector3Time)
                 Sector3Time = GetSafeDoubleProperty(data, "Sector3Time");
             if (settings.Include_Sector1BestTime)
-                Sector1BestTime = GetSafeDoubleProperty(data, "Sector1BestTime");
+                Sector1BestTime = GetSafeDoubleProperty(data, "Sector1BestLapTime");  // iRacing uses "Sector1BestLapTime"
             if (settings.Include_Sector2BestTime)
-                Sector2BestTime = GetSafeDoubleProperty(data, "Sector2BestTime");
+                Sector2BestTime = GetSafeDoubleProperty(data, "Sector2BestLapTime");  // iRacing uses "Sector2BestLapTime"
             if (settings.Include_Sector3BestTime)
-                Sector3BestTime = GetSafeDoubleProperty(data, "Sector3BestTime");
+                Sector3BestTime = GetSafeDoubleProperty(data, "Sector3BestLapTime");  // iRacing uses "Sector3BestLapTime"
             if (settings.Include_CurrentSector)
-                CurrentSector = GetSafeIntProperty(data, "CurrentSector");
+                CurrentSector = GetSafeIntProperty(data, "CurrentSectorIndex");  // iRacing uses "CurrentSectorIndex"
 
             // Lap Information
             if (settings.Include_CurrentLap)

@@ -41,11 +41,13 @@ namespace SimHub.MQTTPublisher.Payload
                 // If SessionFlags not available, build from individual flag properties
                 if (!Flags.HasValue)
                 {
-                    var builtFlags = BuildFlagsFromIndividualProperties(data);
-                    if (builtFlags.HasValue && builtFlags.Value > 0)
-                    {
-                        Flags = builtFlags;
-                    }
+                    Flags = BuildFlagsFromIndividualProperties(data);
+                }
+
+                // If still null or 0, default to 0 to show the property exists
+                if (!Flags.HasValue)
+                {
+                    Flags = 0;
                 }
             }
 
@@ -53,10 +55,9 @@ namespace SimHub.MQTTPublisher.Payload
             if (settings.Include_FlagName)
                 FlagName = GetSafeStringProperty(data, "Flag_Name");
 
-            if (settings.Include_GameName)
-                GameName = GetSafeStringProperty(data, "GameName") ?? GetSafeStringProperty(data, "GameRawName") ?? "Unknown";
+            // Note: GameName has been moved to root level in PayloadRoot
 
-            // Keep individual flags for reference (can be removed later)
+            // Debug flags - only create object if enabled
             if (settings.Include_DebugFlags)
             {
                 DebugFlags = new
@@ -72,6 +73,7 @@ namespace SimHub.MQTTPublisher.Payload
                     SessionFlags = GetSafeIntProperty(data, "SessionFlags")
                 };
             }
+            // If Include_DebugFlags is false, DebugFlags remains null and won't be serialized
         }
 
         /// <summary>
@@ -86,12 +88,6 @@ namespace SimHub.MQTTPublisher.Payload
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string FlagName { get; set; }
-
-        /// <summary>
-        /// Name of the racing simulator/game
-        /// </summary>
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string GameName { get; set; }
 
         /// <summary>
         /// Debug information showing individual flag states (temporary)

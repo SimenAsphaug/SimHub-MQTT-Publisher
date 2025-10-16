@@ -5,6 +5,7 @@ Complete reference of all 80+ telemetry properties available in the SimHub MQTT 
 ## Table of Contents
 
 - [Payload Structure](#payload-structure)
+- [Root-Level Properties](#root-level-properties)
 - [Car State](#car-state)
 - [Flag Information](#flag-information)
 - [Position & Timing Data](#position--timing-data)
@@ -27,6 +28,7 @@ Every MQTT message contains a JSON payload with the following top-level properti
 {
   "time": 1704067200000,
   "userId": "unique-user-id",
+  "gameName": "Assetto Corsa Competizione",
   "carState": { ... },
   "flagState": { ... },
   "positionData": { ... },
@@ -43,14 +45,92 @@ Every MQTT message contains a JSON payload with the following top-level properti
 }
 ```
 
-### Root Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `time` | `integer` | Unix timestamp in milliseconds when data was captured |
-| `userId` | `string` | Unique identifier for the SimHub installation |
-
 **Note:** Only categories with enabled properties will appear in the payload. Empty categories are omitted entirely.
+
+---
+
+## Root-Level Properties
+
+As of **v1.1.0**, you can control which root-level properties are included in the MQTT payload via the "Root Level Properties" section in the Telemetry Configuration tab.
+
+| Property | Type | Description | Default State |
+|----------|------|-------------|---------------|
+| `time` | `long` | Unix timestamp in milliseconds when data was captured | Enabled |
+| `userId` | `string` | Unique identifier for the SimHub installation | Disabled |
+| `gameName` | `string` | Name of the racing simulator (e.g., "iRacing", "Assetto Corsa Competizione") | Enabled |
+
+### Configuration
+
+These properties can be toggled individually in the plugin UI:
+- **Timestamp (Unix milliseconds)** - Enables/disables the `time` property
+- **User ID (Unique identifier)** - Enables/disables the `userId` property
+- **Game Name (Simulator name)** - Enables/disables the `gameName` property
+
+### Example Payloads
+
+**Default configuration (time and gameName enabled):**
+```json
+{
+  "time": 1704067200000,
+  "gameName": "Assetto Corsa Competizione",
+  "carState": {
+    "SpeedKmh": 245.7,
+    "Rpms": 8450
+  }
+}
+```
+
+**All root properties enabled:**
+```json
+{
+  "time": 1704067200000,
+  "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "gameName": "iRacing",
+  "positionData": {
+    "Position": 3,
+    "CurrentLap": 12
+  }
+}
+```
+
+**Only gameName enabled:**
+```json
+{
+  "gameName": "rFactor 2",
+  "tireData": {
+    "TireTemperatures": [85.3, 87.1, 82.5, 84.8]
+  }
+}
+```
+
+### Property Details
+
+**time (Unix timestamp)**
+- Provides precise timing for data correlation and time-series analysis
+- Format: Milliseconds since Unix epoch (January 1, 1970 00:00:00 UTC)
+- Use cases: Data logging, time-series databases, synchronizing multiple data streams
+- Example: `1704067200000` represents January 1, 2024 00:00:00 UTC
+
+**userId (Unique identifier)**
+- Persistent GUID generated on first plugin run
+- Useful for: Multi-user environments, telemetry aggregation, user analytics
+- Disabled by default for privacy
+- Example: `a1b2c3d4-e5f6-7890-abcd-ef1234567890`
+
+**gameName (Simulator name)**
+- Identifies which racing simulator is currently running
+- Essential for: Multi-sim setups, simulator-specific data handling, dashboard switching
+- Examples: "iRacing", "Assetto Corsa Competizione", "rFactor 2", "F1 23"
+- Falls back to "Unknown" if unable to detect the game
+
+### Bandwidth Considerations
+
+Disabling unnecessary root properties can reduce payload size:
+- `time`: ~20 bytes
+- `userId`: ~50 bytes
+- `gameName`: ~30-50 bytes depending on simulator name
+
+With data publishing at 60-100+ updates per second, disabling unused properties can significantly reduce MQTT bandwidth usage.
 
 ---
 
@@ -108,19 +188,19 @@ Race flags and track status indicators.
 |----------|------|-------------|
 | `Flags` | `integer` | Bitwise flag state (see flag documentation) |
 | `FlagName` | `string` | Human-readable flag name |
-| `GameName` | `string` | Racing simulator name |
-| `DebugFlags` | `object` | Individual flag states (debug mode) |
+| `DebugFlags` | `object` | Individual flag states (debug mode, available in Advanced Debugging section) |
 
 **Example:**
 ```json
 {
   "flagState": {
     "Flags": 4,
-    "FlagName": "Green",
-    "GameName": "Assetto Corsa Competizione"
+    "FlagName": "Green"
   }
 }
 ```
+
+**Note:** As of v1.1.0, `gameName` has been moved to the root level of the payload. See [Root-Level Properties](#root-level-properties) for details.
 
 **See also:** [Flag Data Documentation](FLAG-DATA.md)
 
@@ -415,23 +495,34 @@ This minimizes bandwidth usage and simplifies data parsing.
 
 ### Simulator Compatibility
 
+**Note:** As of v1.1.0, property mappings are optimized for **iRacing**. Other simulators are supported, but may have limited data availability or require different property names depending on what each simulator exposes through SimHub.
+
 | Feature Category | iRacing | ACC | AC | rFactor 2 | F1 Games | Other |
 |------------------|---------|-----|----|-----------| ---------|-------|
-| Car State | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Most |
-| Flags | ✓ Full | ✓ Basic | ✓ Basic | ✓ Basic | ✓ Basic | ✓ Varies |
-| Position/Timing | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Most |
-| Tires | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Most |
-| Fuel | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Most |
-| Weather | ✓ Full | ✓ Full | ✓ Basic | ✓ Full | ✓ Full | ✓ Varies |
-| Damage | ✓ Full | ✓ Full | ✓ Basic | ✓ Full | ✓ Full | ✓ Varies |
-| Input Data | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Full | ✓ Most |
-| Safety/Race | ✓ Full | ✓ Full | ✓ Basic | ✓ Full | ✓ Full | ✓ Varies |
+| Car State | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Flags | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Position/Timing | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Tires | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Fuel | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Weather | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Damage | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Input Data | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
+| Safety/Race | ✓ Tested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested | ⚠️ Untested |
 
 **Legend:**
-- ✓ Full: All properties available
-- ✓ Basic: Core properties available, some advanced features missing
-- ✓ Most: Majority of properties available
-- ✓ Varies: Depends on game version and mode
+- ✓ Tested: Verified working with correct property mappings
+- ⚠️ Untested: May work but uses iRacing-specific property names - use Debug Mode to verify available properties
+
+**Property Naming Notes for iRacing:**
+- Tire properties use British spelling "Tyre" (e.g., `TyreTemperatureFrontLeft`)
+- Personal best uses `AllTimeBest` property
+- Delta to personal best uses `DeltaToAllTimeBest`
+- Sector best times use `Sector1BestLapTime`, `Sector2BestLapTime`, `Sector3BestLapTime`
+- Current sector uses `CurrentSectorIndex`
+- Fuel capacity uses `MaxFuel`
+- Estimated fuel laps uses `EstimatedFuelRemaingLaps` (note SimHub's typo: "Remaing")
+
+**For other simulators:** Enable Debug Mode to see all available properties for your specific simulator. Property names may differ from iRacing. Future versions will include fallback logic for multi-simulator support.
 
 ---
 

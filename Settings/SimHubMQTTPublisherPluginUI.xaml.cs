@@ -304,6 +304,11 @@ namespace SimHub.MQTTPublisher.Settings
 
         private void EnableAll_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            // Root Level Properties
+            Model.Include_Time = true;
+            Model.Include_UserId = true;
+            Model.Include_GameName = true;
+
             // Car State
             Model.Include_SpeedKmh = true;
             Model.Include_Rpms = true;
@@ -321,8 +326,7 @@ namespace SimHub.MQTTPublisher.Settings
             // Flag Information
             Model.Include_Flags = true;
             Model.Include_FlagName = true;
-            Model.Include_GameName = true;
-            Model.Include_DebugFlags = true;
+            // Note: DebugFlags excluded from "Enable All" - it's an advanced debugging option
 
             // Position & Timing Data
             Model.Include_Position = true;

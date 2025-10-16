@@ -15,6 +15,10 @@ namespace SimHub.MQTTPublisher
 
         public string Password { get; set; } = "admin";
 
+        // === ROOT LEVEL PROPERTIES ===
+        public bool Include_Time { get; set; } = true;
+        public bool Include_UserId { get; set; } = false;
+
         // === CAR STATE PROPERTIES ===
         public bool Include_SpeedKmh { get; set; } = true;
         public bool Include_Rpms { get; set; } = true;
@@ -32,7 +36,7 @@ namespace SimHub.MQTTPublisher
         // === FLAG INFORMATION ===
         public bool Include_Flags { get; set; } = true;
         public bool Include_FlagName { get; set; } = false;
-        public bool Include_GameName { get; set; } = false;
+        public bool Include_GameName { get; set; } = true;  // Root-level property, enabled by default
         public bool Include_DebugFlags { get; set; } = false;
 
         // === POSITION & TIMING DATA ===

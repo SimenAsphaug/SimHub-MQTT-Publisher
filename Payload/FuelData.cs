@@ -15,16 +15,16 @@ namespace SimHub.MQTTPublisher.Payload
             }
 
             if (settings.Include_FuelCapacity)
-                FuelCapacity = GetSafeDoubleProperty(data, "FuelCapacity");
+                FuelCapacity = GetSafeDoubleProperty(data, "MaxFuel");  // SimHub/iRacing use "MaxFuel"
 
             if (settings.Include_FuelPerLap)
                 FuelPerLap = GetSafeDoubleProperty(data, "FuelPerLap");
 
             if (settings.Include_FuelRemaining)
-                FuelRemaining = GetSafeDoubleProperty(data, "FuelRemaining");
+                FuelRemaining = GetSafeDoubleProperty(data, "Fuel");  // "Fuel" is the remaining fuel
 
             if (settings.Include_FuelEstimatedLaps)
-                FuelEstimatedLaps = GetSafeDoubleProperty(data, "FuelEstimatedLaps");
+                FuelEstimatedLaps = GetSafeDoubleProperty(data, "EstimatedFuelRemaingLaps");  // Note: SimHub has a typo "Remaing"
 
             if (settings.Include_FuelToEnd)
                 FuelToEnd = GetSafeDoubleProperty(data, "FuelToEnd");

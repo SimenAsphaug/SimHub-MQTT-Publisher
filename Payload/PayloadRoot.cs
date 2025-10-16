@@ -9,8 +9,21 @@ namespace SimHub.MQTTPublisher.Payload
     {
         public PayloadRoot(GameData data, SimHubMQTTPublisherPluginUserSettings userSettings, SimHubMQTTPublisherPluginSettings settings)
         {
-            time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            userId = userSettings.UserId.ToString();
+            // Root level properties - conditionally included
+            if (settings.Include_Time)
+            {
+                time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            }
+
+            if (settings.Include_UserId)
+            {
+                userId = userSettings.UserId.ToString();
+            }
+
+            if (settings.Include_GameName)
+            {
+                gameName = data.GameName ?? "Unknown";
+            }
 
             // Debug mode: Include ALL raw telemetry data
             if (settings.EnableDebugMode)
@@ -29,8 +42,7 @@ namespace SimHub.MQTTPublisher.Payload
             }
 
             // Check if ANY Flag properties are enabled
-            if (settings.Include_Flags || settings.Include_FlagName ||
-                settings.Include_GameName || settings.Include_DebugFlags)
+            if (settings.Include_Flags || settings.Include_FlagName || settings.Include_DebugFlags)
             {
                 flagState = new Flag(data, settings);
             }
@@ -130,8 +142,9 @@ namespace SimHub.MQTTPublisher.Payload
             }
         }
 
-        public long time { get; set; }
+        public long? time { get; set; }
         public string userId { get; set; }
+        public string gameName { get; set; }
         public Car carState { get; set; }
         public Flag flagState { get; set; }
         public TrackInformation trackInformation { get; set; }
@@ -169,8 +182,13 @@ namespace SimHub.MQTTPublisher.Payload
 
             try
             {
+                // Add metadata about the data source
+                allData["_GameName"] = data.GameName ?? "Unknown";
+                allData["_GameRunning"] = data.GameRunning;
+
                 // Get all properties from NewData
                 var properties = data.NewData.GetType().GetProperties();
+                var propertiesData = new Dictionary<string, object>();
 
                 foreach (var prop in properties)
                 {
@@ -178,23 +196,47 @@ namespace SimHub.MQTTPublisher.Payload
                     {
                         var value = prop.GetValue(data.NewData);
 
-                        // Only include properties that have values and are not null
-                        if (value != null)
+                        // Skip complex objects like SessionData to keep output readable
+                        if (prop.PropertyType.IsClass &&
+                            prop.PropertyType != typeof(string) &&
+                            !prop.PropertyType.IsArray)
                         {
-                            allData[prop.Name] = value;
+                            propertiesData[prop.Name] = $"[Complex Object: {prop.PropertyType.Name}]";
+                            continue;
                         }
+
+                        // Convert arrays to comma-separated strings for readability
+                        if (value != null && prop.PropertyType.IsArray)
+                        {
+                            try
+                            {
+                                var array = value as Array;
+                                var items = new List<string>();
+                                foreach (var item in array)
+                                {
+                                    items.Add(item?.ToString() ?? "null");
+                                }
+                                propertiesData[prop.Name] = $"[{string.Join(", ", items)}]";
+                            }
+                            catch
+                            {
+                                propertiesData[prop.Name] = "[Array]";
+                            }
+                            continue;
+                        }
+
+                        // Include simple value types and strings
+                        propertiesData[prop.Name] = value?.ToString() ?? "null";
                     }
-                    catch
+                    catch (Exception propEx)
                     {
-                        // Skip properties that throw exceptions
-                        continue;
+                        // Include properties that throw exceptions with error info
+                        propertiesData[prop.Name] = $"ERROR: {propEx.Message}";
                     }
                 }
 
-                // Add metadata about the data source
-                allData["_GameName"] = data.GameName ?? "Unknown";
-                allData["_GameRunning"] = data.GameRunning;
-                allData["_PropertyCount"] = allData.Count;
+                allData["AllProperties"] = propertiesData;
+                allData["_PropertyCount"] = propertiesData.Count;
             }
             catch (Exception ex)
             {

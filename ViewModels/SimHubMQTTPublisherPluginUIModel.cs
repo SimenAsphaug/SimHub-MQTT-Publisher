@@ -19,6 +19,10 @@ namespace SimHub.MQTTPublisher.ViewModels
 
         private Guid _UserId;
 
+        // === ROOT LEVEL PROPERTIES ===
+        private bool _include_Time = true;
+        private bool _include_UserId = false;
+
         // === CAR STATE PROPERTIES ===
         private bool _include_SpeedKmh = true;
         private bool _include_Rpms = true;
@@ -179,6 +183,27 @@ namespace SimHub.MQTTPublisher.ViewModels
             set
             {
                 _UserId = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // === ROOT LEVEL PROPERTIES ===
+        public bool Include_Time
+        {
+            get => _include_Time;
+            set
+            {
+                _include_Time = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Include_UserId
+        {
+            get => _include_UserId;
+            set
+            {
+                _include_UserId = value;
                 OnPropertyChanged();
             }
         }
