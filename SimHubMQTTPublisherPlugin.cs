@@ -58,8 +58,11 @@ namespace SimHub.MQTTPublisher
                         NullValueHandling = NullValueHandling.Ignore
                     });
 
+                // Resolve topic placeholders like {gameName}
+                var resolvedTopic = ResolveTopic(Settings.Topic, data);
+
                 var applicationMessage = new MqttApplicationMessageBuilder()
-               .WithTopic(Settings.Topic)
+               .WithTopic(resolvedTopic)
                .WithPayload(payload)
                .Build();
 
@@ -128,6 +131,92 @@ namespace SimHub.MQTTPublisher
             {
                 oldMqttClient.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Resolves topic placeholders like {gameName}, {sessionType}, {trackName}, {carName} with actual values
+        /// </summary>
+        /// <param name="topic">Topic template with placeholders</param>
+        /// <param name="data">Game data containing runtime values</param>
+        /// <returns>Resolved topic string</returns>
+        private string ResolveTopic(string topic, GameData data)
+        {
+            if (string.IsNullOrEmpty(topic))
+                return topic;
+
+            // Replace {gameName} with actual game name
+            if (topic.Contains("{gameName}"))
+            {
+                var gameName = data.GameName ?? "Unknown";
+                gameName = SanitizeTopicSegment(gameName);
+                topic = topic.Replace("{gameName}", gameName);
+            }
+
+            // Replace {sessionType} with current session type (Practice, Qualifying, Race, etc.)
+            if (topic.Contains("{sessionType}"))
+            {
+                var sessionType = GetPropertyValue(data, "SessionTypeName") ?? "Unknown";
+                sessionType = SanitizeTopicSegment(sessionType);
+                topic = topic.Replace("{sessionType}", sessionType);
+            }
+
+            // Replace {trackName} with current track/circuit name
+            if (topic.Contains("{trackName}"))
+            {
+                var trackName = GetPropertyValue(data, "TrackName") ?? GetPropertyValue(data, "TrackDisplayName") ?? "Unknown";
+                trackName = SanitizeTopicSegment(trackName);
+                topic = topic.Replace("{trackName}", trackName);
+            }
+
+            // Replace {carName} with current vehicle name
+            if (topic.Contains("{carName}"))
+            {
+                var carName = GetPropertyValue(data, "CarName") ?? GetPropertyValue(data, "CarModel") ?? "Unknown";
+                carName = SanitizeTopicSegment(carName);
+                topic = topic.Replace("{carName}", carName);
+            }
+
+            return topic;
+        }
+
+        /// <summary>
+        /// Safely retrieves a property value from GameData using reflection
+        /// </summary>
+        /// <param name="data">Game data object</param>
+        /// <param name="propertyName">Property name to retrieve</param>
+        /// <returns>Property value as string, or null if not found</returns>
+        private string GetPropertyValue(GameData data, string propertyName)
+        {
+            try
+            {
+                var property = data.NewData.GetType().GetProperty(propertyName);
+                var value = property?.GetValue(data.NewData);
+                return value?.ToString();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Sanitizes a string for use in MQTT topics (removes invalid characters)
+        /// </summary>
+        /// <param name="input">String to sanitize</param>
+        /// <returns>Sanitized string safe for MQTT topics</returns>
+        private string SanitizeTopicSegment(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return "Unknown";
+
+            // Replace spaces with underscores
+            input = input.Replace(" ", "_");
+
+            // Remove any characters that aren't alphanumeric, underscore, or hyphen
+            input = System.Text.RegularExpressions.Regex.Replace(input, @"[^a-zA-Z0-9_\-]", "");
+
+            // If result is empty, return Unknown
+            return string.IsNullOrEmpty(input) ? "Unknown" : input;
         }
     }
 }

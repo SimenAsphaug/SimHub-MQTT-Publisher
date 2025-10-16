@@ -70,7 +70,15 @@
                         </Grid>
 
                         <Label Grid.Row="3">Topic</Label>
-                        <TextBox Margin="4" Grid.Row="3" Grid.Column="1" Text="{Binding Path=Topic}" />
+                        <StackPanel Grid.Row="3" Grid.Column="1" Margin="4">
+                            <TextBox Text="{Binding Path=Topic}" />
+                            <TextBlock FontSize="10" Foreground="Gray" Margin="0,2,0,0" TextWrapping="Wrap">
+                                Supports placeholders: {gameName}, {sessionType}, {trackName}, {carName}
+                            </TextBlock>
+                            <TextBlock FontSize="10" Foreground="Gray" Margin="0,2,0,0" TextWrapping="Wrap">
+                                Example: "simhub/{gameName}/{trackName}" → "simhub/IRacing/Spa-Francorchamps"
+                            </TextBlock>
+                        </StackPanel>
 
                         <Label Grid.Row="4">User ID</Label>
                         <TextBox Margin="4" Grid.Row="4" Grid.Column="1" Text="{Binding Path=UserId}" IsReadOnly="true" />

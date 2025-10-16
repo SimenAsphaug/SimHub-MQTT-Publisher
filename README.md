@@ -9,6 +9,7 @@ A powerful and flexible SimHub plugin that publishes granular racing telemetry d
 - **80+ Granular Telemetry Properties** - Select exactly what data you need
 - **Organized Tab Interface** - Clean UI with Connection, Presets, Telemetry, and Settings tabs
 - **Root-Level Property Control** - Choose to include/exclude timestamp, userId, and gameName
+- **Dynamic Topic Placeholders** - Use {gameName}, {sessionType}, {trackName}, {carName} for flexible routing
 - **Real-time MQTT Publishing** - Low-latency data streaming to any MQTT broker
 - **Quick Preset Configurations** - Basic, Racing, Strategy, and Analysis presets
 - **Export/Import Settings** - Share configurations between installations
@@ -69,6 +70,22 @@ A powerful and flexible SimHub plugin that publishes granular racing telemetry d
    Password: your_password (if authentication enabled)
    Topic: simhub/telemetry (or your preferred topic)
    ```
+
+   **Topic Placeholders:**
+
+   You can use dynamic placeholders in your MQTT topic that will be replaced with real-time values:
+
+   - `{gameName}` - Current simulator (e.g., "IRacing", "Assetto_Corsa_Competizione")
+   - `{sessionType}` - Session type (e.g., "Practice", "Qualifying", "Race")
+   - `{trackName}` - Current track/circuit (e.g., "Spa-Francorchamps", "Monza")
+   - `{carName}` - Current vehicle (e.g., "Porsche_911_GT3_R", "Ferrari_488_GT3")
+
+   All placeholders are automatically sanitized (spaces → underscores, special chars removed)
+
+   **Examples:**
+   - `simhub/{gameName}/telemetry` → `simhub/IRacing/telemetry`
+   - `racing/{trackName}/{carName}` → `racing/Spa-Francorchamps/Porsche_911_GT3_R`
+   - `telemetry/{gameName}/{sessionType}` → `telemetry/IRacing/Race`
 
 3. **Test Connection**:
    - Click the "Test Connection" button
@@ -343,10 +360,13 @@ Contributions are welcome! Please feel free to:
 **v1.1.0** (Current)
 - **Organized Tab Interface**: Separated UI into Connection, Presets, Telemetry, and Settings tabs
 - **Root-Level Property Control**: Choose which root properties to include (time, userId, gameName)
+- **Dynamic Topic Placeholders**: Support for {gameName}, {sessionType}, {trackName}, {carName} placeholders in MQTT topics
+- **iRacing Property Mappings**: Fixed all property names to match iRacing telemetry (tire temps, fuel, lap times, sectors)
+- **Enhanced Debug Mode**: Shows clean list of all available properties with values for property discovery
 - **Performance Warnings**: Added clear warnings about payload size and CPU usage
 - **Debug Flag Details**: Moved to Advanced Debugging section with dedicated checkbox
 - **Improved Presets**: "Enable All" now excludes debug options for safety
-- **Better UX**: Global Apply Settings button, clearer organization, helpful tooltips
+- **Better UX**: Global Apply Settings button, clearer organization, helpful tooltips, collapsed expanders by default
 
 **v1.0.0**
 - Complete rewrite with 80+ granular telemetry properties
