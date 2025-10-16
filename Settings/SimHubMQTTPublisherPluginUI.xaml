@@ -1,0 +1,311 @@
+<UserControl x:Class="SimHub.MQTTPublisher.Settings.SimHubMQTTPublisherPluginUI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewmodels="clr-namespace:SimHub.MQTTPublisher.ViewModels"
+             xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance viewmodels:SimHubMQTTPublisherPluginUIModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Plugin Info Section -->
+        <styles:SHSection Grid.Row="0" Title="Plugin Information">
+            <StackPanel>
+                <TextBlock Text="{Binding Path=PluginTitle}" FontWeight="Bold" />
+                <TextBlock Text="{Binding Path=PluginVersion}" />
+                <TextBlock Text="{Binding Path=PluginCopyright}" />
+                <TextBlock Margin="0,8,0,0" FontSize="11" Foreground="Gray" TextWrapping="Wrap">
+                    <Run Text="Forked from and enhanced: "/>
+                    <Hyperlink NavigateUri="https://github.com/SHWotever/SimHub-MQTT-Publisher" RequestNavigate="Hyperlink_RequestNavigate">
+                        <Run Text="github.com/SHWotever/SimHub-MQTT-Publisher"/>
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </styles:SHSection>
+
+        <!-- MQTT Settings Section -->
+        <styles:SHSection Grid.Row="1" Title="MQTT Settings">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Connection Settings -->
+                <GroupBox Grid.Row="0" Header="Connection Settings">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="*" MinWidth="300" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0">MQTT Server</Label>
+                        <TextBox Margin="4" Grid.Row="0" Grid.Column="1" Text="{Binding Path=Server}" />
+
+                        <Label Grid.Row="1">Login</Label>
+                        <TextBox Margin="4" Grid.Row="1" Grid.Column="1" Text="{Binding Path=Login}" />
+
+                        <Label Grid.Row="2">Password</Label>
+                        <Grid Grid.Row="2" Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <PasswordBox x:Name="PasswordBoxHidden" Margin="4" Grid.Column="0" PasswordChanged="PasswordBox_PasswordChanged" />
+                            <TextBox x:Name="PasswordBoxVisible" Margin="4" Grid.Column="0" Text="{Binding Path=Password}" Visibility="Collapsed" />
+                            <CheckBox Grid.Column="1" Content="Show" VerticalAlignment="Center" Margin="8,4,4,4"
+                                      Checked="ShowPassword_Checked" Unchecked="ShowPassword_Unchecked"/>
+                        </Grid>
+
+                        <Label Grid.Row="3">Topic</Label>
+                        <TextBox Margin="4" Grid.Row="3" Grid.Column="1" Text="{Binding Path=Topic}" />
+
+                        <Label Grid.Row="4">User ID</Label>
+                        <TextBox Margin="4" Grid.Row="4" Grid.Column="1" Text="{Binding Path=UserId}" IsReadOnly="true" />
+
+                        <Label Grid.Row="5">Connection</Label>
+                        <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="4">
+                            <styles:SHButtonPrimary Margin="0,0,8,0" Click="TestConnection_Click">Test Connection</styles:SHButtonPrimary>
+                            <TextBlock x:Name="ConnectionStatusText" VerticalAlignment="Center" Text="Not tested" Foreground="Gray"/>
+                        </StackPanel>
+
+                        <styles:SHButtonPrimary Margin="4" Grid.Row="6" Grid.Column="1" Click="Apply_Settings">Apply Settings</styles:SHButtonPrimary>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Telemetry Options -->
+                <GroupBox Grid.Row="1" Header="Granular Telemetry Configuration">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="500">
+                        <StackPanel>
+                            <!-- Export/Import Settings -->
+                            <TextBlock Text="Configuration Management" FontWeight="Bold" Margin="4"/>
+                            <StackPanel Orientation="Horizontal" Margin="4,4,4,8">
+                                <styles:SHButtonPrimary Margin="2" Click="ExportSettings_Click">Export Settings</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="2" Click="ImportSettings_Click">Import Settings</styles:SHButtonPrimary>
+                            </StackPanel>
+                            <Separator Margin="0,0,0,8"/>
+
+                            <!-- Quick Preset Actions -->
+                            <TextBlock Text="Quick Presets" FontWeight="Bold" Margin="4"/>
+                            <StackPanel Orientation="Horizontal" Margin="4">
+                                <styles:SHButtonPrimary Margin="2" Click="EnableAll_Click">Enable All</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="2" Click="DisableAll_Click">Disable All</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="2" Click="EnableBasic_Click">Basic</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="2" Click="EnableRacing_Click">Racing</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="2" Click="EnableStrategy_Click">Strategy</styles:SHButtonPrimary>
+                                <styles:SHButtonPrimary Margin="2" Click="EnableAnalysis_Click">Analysis</styles:SHButtonPrimary>
+                            </StackPanel>
+                            <Separator Margin="0,4,0,8"/>
+
+                            <!-- Car State -->
+                            <Expander Header="Car State" IsExpanded="True" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Speed (km/h)" IsChecked="{Binding Path=Include_SpeedKmh}" Margin="2"/>
+                                    <CheckBox Content="RPM" IsChecked="{Binding Path=Include_Rpms}" Margin="2"/>
+                                    <CheckBox Content="Gear" IsChecked="{Binding Path=Include_Gear}" Margin="2"/>
+                                    <CheckBox Content="Throttle" IsChecked="{Binding Path=Include_Throttle}" Margin="2"/>
+                                    <CheckBox Content="Brake" IsChecked="{Binding Path=Include_Brake}" Margin="2"/>
+                                    <CheckBox Content="Clutch" IsChecked="{Binding Path=Include_Clutch}" Margin="2"/>
+                                    <CheckBox Content="Car Coordinates" IsChecked="{Binding Path=Include_CarCoordinates}" Margin="2"/>
+                                    <CheckBox Content="Current Lap Time" IsChecked="{Binding Path=Include_CurrentLapTime}" Margin="2"/>
+                                    <CheckBox Content="Car Model" IsChecked="{Binding Path=Include_CarModel}" Margin="2"/>
+                                    <CheckBox Content="Car Class" IsChecked="{Binding Path=Include_CarClass}" Margin="2"/>
+                                    <CheckBox Content="Engine Ignition On" IsChecked="{Binding Path=Include_EngineIgnitionOn}" Margin="2"/>
+                                    <CheckBox Content="Engine Started" IsChecked="{Binding Path=Include_EngineStarted}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Flag Information -->
+                            <Expander Header="Flag Information" IsExpanded="True" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Flag State (Integer)" IsChecked="{Binding Path=Include_Flags}" Margin="2"/>
+                                    <CheckBox Content="Flag Name" IsChecked="{Binding Path=Include_FlagName}" Margin="2"/>
+                                    <CheckBox Content="Game Name" IsChecked="{Binding Path=Include_GameName}" Margin="2"/>
+                                    <CheckBox Content="Debug Flag Details" IsChecked="{Binding Path=Include_DebugFlags}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Position & Timing -->
+                            <Expander Header="Position and Timing Data" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <TextBlock Text="Position Information" FontWeight="Bold" Margin="2"/>
+                                    <CheckBox Content="Current Position" IsChecked="{Binding Path=Include_Position}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Position in Class" IsChecked="{Binding Path=Include_PositionInClass}" Margin="15,2,2,2"/>
+
+                                    <TextBlock Text="Gap Information" FontWeight="Bold" Margin="2,8,2,2"/>
+                                    <CheckBox Content="Gap to Leader" IsChecked="{Binding Path=Include_GapToLeader}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Gap to Car Ahead" IsChecked="{Binding Path=Include_GapToAhead}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Gap to Car Behind" IsChecked="{Binding Path=Include_GapToBehind}" Margin="15,2,2,2"/>
+
+                                    <TextBlock Text="Lap Times" FontWeight="Bold" Margin="2,8,2,2"/>
+                                    <CheckBox Content="Last Lap Time" IsChecked="{Binding Path=Include_LastLapTime}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Best Lap Time" IsChecked="{Binding Path=Include_BestLapTime}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Personal Best" IsChecked="{Binding Path=Include_PersonalBestLapTime}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Session Best" IsChecked="{Binding Path=Include_SessionBestLapTime}" Margin="15,2,2,2"/>
+
+                                    <TextBlock Text="Delta Times" FontWeight="Bold" Margin="2,8,2,2"/>
+                                    <CheckBox Content="Delta to Session Best" IsChecked="{Binding Path=Include_DeltaToSessionBest}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Delta to Personal Best" IsChecked="{Binding Path=Include_DeltaToPersonalBest}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Delta to Optimal" IsChecked="{Binding Path=Include_DeltaToOptimal}" Margin="15,2,2,2"/>
+
+                                    <TextBlock Text="Sector Times" FontWeight="Bold" Margin="2,8,2,2"/>
+                                    <CheckBox Content="Sector 1 Time" IsChecked="{Binding Path=Include_Sector1Time}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Sector 2 Time" IsChecked="{Binding Path=Include_Sector2Time}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Sector 3 Time" IsChecked="{Binding Path=Include_Sector3Time}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Sector 1 Best" IsChecked="{Binding Path=Include_Sector1BestTime}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Sector 2 Best" IsChecked="{Binding Path=Include_Sector2BestTime}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Sector 3 Best" IsChecked="{Binding Path=Include_Sector3BestTime}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Current Sector" IsChecked="{Binding Path=Include_CurrentSector}" Margin="15,2,2,2"/>
+
+                                    <TextBlock Text="Lap Information" FontWeight="Bold" Margin="2,8,2,2"/>
+                                    <CheckBox Content="Current Lap" IsChecked="{Binding Path=Include_CurrentLap}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Total Laps" IsChecked="{Binding Path=Include_TotalLaps}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Completed Laps" IsChecked="{Binding Path=Include_CompletedLaps}" Margin="15,2,2,2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Tire Data -->
+                            <Expander Header="Tire Data" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Tire Temperatures (FL, FR, RL, RR)" IsChecked="{Binding Path=Include_TireTemperatures}" Margin="2"/>
+                                    <CheckBox Content="Tire Pressures (FL, FR, RL, RR)" IsChecked="{Binding Path=Include_TirePressures}" Margin="2"/>
+                                    <CheckBox Content="Tire Wear (FL, FR, RL, RR)" IsChecked="{Binding Path=Include_TireWear}" Margin="2"/>
+                                    <CheckBox Content="Tire Grip (FL, FR, RL, RR)" IsChecked="{Binding Path=Include_TireGrip}" Margin="2"/>
+                                    <CheckBox Content="Tire Compound" IsChecked="{Binding Path=Include_TireCompound}" Margin="2"/>
+                                    <CheckBox Content="Tire Dirt (FL, FR, RL, RR)" IsChecked="{Binding Path=Include_TireDirt}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Fuel & Energy -->
+                            <Expander Header="Fuel and Energy Management" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <TextBlock Text="Fuel Information" FontWeight="Bold" Margin="2"/>
+                                    <CheckBox Content="Fuel Level and Capacity" IsChecked="{Binding Path=Include_Fuel}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Fuel Per Lap" IsChecked="{Binding Path=Include_FuelPerLap}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Fuel Remaining" IsChecked="{Binding Path=Include_FuelRemaining}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Estimated Laps on Current Fuel" IsChecked="{Binding Path=Include_FuelEstimatedLaps}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Fuel to End" IsChecked="{Binding Path=Include_FuelToEnd}" Margin="15,2,2,2"/>
+
+                                    <TextBlock Text="Energy Systems" FontWeight="Bold" Margin="2,8,2,2"/>
+                                    <CheckBox Content="ERS Data (Energy Recovery)" IsChecked="{Binding Path=Include_ERS_Data}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="DRS Data (Drag Reduction)" IsChecked="{Binding Path=Include_DRS_Data}" Margin="15,2,2,2"/>
+                                    <CheckBox Content="Battery Data (Electric Vehicles)" IsChecked="{Binding Path=Include_BatteryData}" Margin="15,2,2,2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Weather & Conditions -->
+                            <Expander Header="Weather and Track Conditions" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Air Temperature" IsChecked="{Binding Path=Include_AirTemperature}" Margin="2"/>
+                                    <CheckBox Content="Track Temperature" IsChecked="{Binding Path=Include_TrackTemperature}" Margin="2"/>
+                                    <CheckBox Content="Weather Type and Rain Level" IsChecked="{Binding Path=Include_WeatherType}" Margin="2"/>
+                                    <CheckBox Content="Rain Level" IsChecked="{Binding Path=Include_RainLevel}" Margin="2"/>
+                                    <CheckBox Content="Humidity" IsChecked="{Binding Path=Include_Humidity}" Margin="2"/>
+                                    <CheckBox Content="Wind Data (Speed, Direction)" IsChecked="{Binding Path=Include_WindData}" Margin="2"/>
+                                    <CheckBox Content="Track Grip Level" IsChecked="{Binding Path=Include_TrackGrip}" Margin="2"/>
+                                    <CheckBox Content="Time of Day and Lighting" IsChecked="{Binding Path=Include_TimeOfDay}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Damage & Mechanical -->
+                            <Expander Header="Damage and Mechanical Data" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Car Damage (Engine, Transmission, Aero, etc.)" IsChecked="{Binding Path=Include_CarDamage}" Margin="2"/>
+                                    <CheckBox Content="Engine Temperatures (Water, Oil)" IsChecked="{Binding Path=Include_EngineTemperatures}" Margin="2"/>
+                                    <CheckBox Content="Brake Temperatures (FL, FR, RL, RR)" IsChecked="{Binding Path=Include_BrakeTemperatures}" Margin="2"/>
+                                    <CheckBox Content="Turbo and Manifold Data" IsChecked="{Binding Path=Include_TurboData}" Margin="2"/>
+                                    <CheckBox Content="Component Wear Indicators" IsChecked="{Binding Path=Include_WearIndicators}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Driver Input -->
+                            <Expander Header="Driver Input Data" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Steering Input and Angle" IsChecked="{Binding Path=Include_SteeringInput}" Margin="2"/>
+                                    <CheckBox Content="Raw Pedal Inputs (Throttle, Brake, Clutch)" IsChecked="{Binding Path=Include_PedalInputs}" Margin="2"/>
+                                    <CheckBox Content="Driver Assists (TC, ABS, Stability)" IsChecked="{Binding Path=Include_DriverAssists}" Margin="2"/>
+                                    <CheckBox Content="Electronic Systems (ESP, Brake Bias)" IsChecked="{Binding Path=Include_ElectronicSystems}" Margin="2"/>
+                                    <CheckBox Content="Input Device Info (Wheel, Gamepad, Keyboard)" IsChecked="{Binding Path=Include_InputDeviceInfo}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Safety & Race Control -->
+                            <Expander Header="Safety and Race Control" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Safety Car Information" IsChecked="{Binding Path=Include_SafetyCarInfo}" Margin="2"/>
+                                    <CheckBox Content="Flag Sectors (Yellow Flag Zones)" IsChecked="{Binding Path=Include_FlagSectors}" Margin="2"/>
+                                    <CheckBox Content="Pit Information (In Pit, Pit Limiter)" IsChecked="{Binding Path=Include_PitInformation}" Margin="2"/>
+                                    <CheckBox Content="Race Control (Start, Finish, Pause)" IsChecked="{Binding Path=Include_RaceControl}" Margin="2"/>
+                                    <CheckBox Content="Penalties and Flags" IsChecked="{Binding Path=Include_Penalties}" Margin="2"/>
+                                    <CheckBox Content="Formation and Warmup Laps" IsChecked="{Binding Path=Include_FormationLap}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Track Information -->
+                            <Expander Header="Track Information" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Track Name" IsChecked="{Binding Path=Include_TrackName}" Margin="2"/>
+                                    <CheckBox Content="Track Length" IsChecked="{Binding Path=Include_TrackLength}" Margin="2"/>
+                                    <CheckBox Content="Track Configuration" IsChecked="{Binding Path=Include_TrackConfiguration}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Vehicle Information -->
+                            <Expander Header="Vehicle Information" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Vehicle Model" IsChecked="{Binding Path=Include_VehicleModel}" Margin="2"/>
+                                    <CheckBox Content="Vehicle Class" IsChecked="{Binding Path=Include_VehicleClass}" Margin="2"/>
+                                    <CheckBox Content="Maximum RPM" IsChecked="{Binding Path=Include_MaxRpm}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Session Information -->
+                            <Expander Header="Session Information" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <CheckBox Content="Session Type (Practice, Qualifying, Race)" IsChecked="{Binding Path=Include_SessionType}" Margin="2"/>
+                                    <CheckBox Content="Session Time Remaining" IsChecked="{Binding Path=Include_SessionTimeLeft}" Margin="2"/>
+                                    <CheckBox Content="Session Lap Information" IsChecked="{Binding Path=Include_SessionLaps}" Margin="2"/>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Advanced Debugging -->
+                            <Expander Header="Advanced Debugging" Margin="2">
+                                <StackPanel Margin="15,5,5,5">
+                                    <TextBlock Text="WARNING: Debug mode sends ALL raw telemetry data" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="This includes the complete GameData object with all properties from the simulator. Use with caution as this will significantly increase data volume." TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                                    <CheckBox Content="Enable Debug Mode (Send All Raw Telemetry)" IsChecked="{Binding Path=EnableDebugMode}" Margin="0,0,0,12" FontWeight="Bold"/>
+
+                                    <Separator Margin="0,0,0,8"/>
+
+                                    <TextBlock Text="Use Cases:" FontWeight="Bold" Margin="0,0,0,4"/>
+                                    <TextBlock Text="• Discover new telemetry properties available in your simulator" TextWrapping="Wrap" Margin="12,2,0,2"/>
+                                    <TextBlock Text="• Debug and troubleshoot data issues" TextWrapping="Wrap" Margin="12,2,0,2"/>
+                                    <TextBlock Text="• Explore complete data structure for custom integrations" TextWrapping="Wrap" Margin="12,2,0,8"/>
+
+                                    <TextBlock Text="Debug data will be sent under 'debugData' property in the MQTT payload." TextWrapping="Wrap" Margin="0,0,0,4" FontStyle="Italic"/>
+                                </StackPanel>
+                            </Expander>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+            </Grid>
+        </styles:SHSection>
+    </Grid>
+</UserControl>
