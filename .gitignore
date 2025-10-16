@@ -261,3 +261,12 @@ paket-files/
 __pycache__/
 *.pyc
 /Endeca.Export.Navigation/.nuget/NuGet.exe
+
+# Claude Code configuration
+.claude/
+
+# GitHub workflows and actions (not needed for this project)
+.github/
+
+# Temporary release notes
+RELEASE_*.md
